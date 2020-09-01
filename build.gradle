@@ -101,7 +101,7 @@ task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
 }
 
 dependencies {
-	implementation fileTree(dir: new File(buildDir, 'libs'), include: '*.jar')
+    implementation fileTree(dir: new File(buildDir, 'libs'), include: '*.jar')
     implementation(name: 'vl-serenegiant-common-release-1.4.3', ext: 'aar')
     implementation "com.android.support:support-annotations:${supportLibVersion}"
 }
