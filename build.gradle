@@ -35,6 +35,9 @@ buildscript {
 
 allprojects {
 	repositories {
+		flatDir {
+			dirs '../ucm_camera_prototype/libs'
+		}
 		maven { url 'https://raw.github.com/saki4510t/libcommon/master/repository/' }
 		jcenter()
 		google()
@@ -43,7 +46,6 @@ allprojects {
 
 ext {
 	supportLibVersion = '28.0.0'  // variable that can be referenced to keep support libs consistent
-	commonLibVersion= '1.4.3'
 	versionCompiler = 25
 	versionTarget = 23
 	versionNameString = '1.0.0'
@@ -99,9 +101,7 @@ task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
 }
 
 dependencies {
-    implementation fileTree(dir: new File(buildDir, 'libs'), include: '*.jar')
+	implementation fileTree(dir: new File(buildDir, 'libs'), include: '*.jar')
+    implementation(name: 'vl-serenegiant-common-release-1.4.3', ext: 'aar')
     implementation "com.android.support:support-annotations:${supportLibVersion}"
-    implementation("com.serenegiant:common:${commonLibVersion}") {
-        exclude module: 'support-v4'
-	}
 }
