@@ -57,6 +57,7 @@ public final class USBMonitor {
 	private static final String TAG = "USBMonitor";
 
 	private static final String ACTION_USB_PERMISSION_BASE = "com.serenegiant.USB_PERMISSION.";
+	private static final String VL_PERMISSION_NAME = "com.ucm.camera.INTERNAL_PERMISSION";
 	private final String ACTION_USB_PERMISSION = ACTION_USB_PERMISSION_BASE + hashCode();
 
 	public static final String ACTION_USB_DEVICE_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED";
@@ -169,8 +170,8 @@ public final class USBMonitor {
 				final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 				// ACTION_USB_DEVICE_ATTACHED never comes on some devices so it should not be added here
 				filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-//				context.registerReceiver(mUsbReceiver, filter);
-				context.registerReceiver(mUsbReceiver, filter, "android.permission.USB_PERMISSION", null);
+  				context.registerReceiver(mUsbReceiver, filter, VL_PERMISSION_NAME, null);
+				context.registerReceiver(mUsbAttachDetachReceiver, filter, VL_PERMISSION_NAME, null);
 			}
 			// start connection check
 			mDeviceCounts = 0;
@@ -194,6 +195,7 @@ public final class USBMonitor {
 			try {
 				if (context != null) {
 					context.unregisterReceiver(mUsbReceiver);
+					context.unregisterReceiver(mUsbAttachDetachReceiver);
 				}
 			} catch (final Exception e) {
 				Log.w(TAG, e);
@@ -485,7 +487,20 @@ public final class USBMonitor {
 						processCancel(device);
 					}
 				}
-			} else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+			}
+		}
+	};
+
+	/**
+	 * BroadcastReceiver for USB attach/detach
+	 */
+	private final BroadcastReceiver mUsbAttachDetachReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(final Context context, final Intent intent) {
+			if (destroyed) return;
+			final String action = intent.getAction();
+			if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
 				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 				updatePermission(device, hasPermission(device));
 				processAttach(device);
