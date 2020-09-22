@@ -167,11 +167,11 @@ public final class USBMonitor {
 			final Context context = mWeakContext.get();
 			if (context != null) {
 				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-				final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+				final IntentFilter usbPermissionFilter = new IntentFilter(ACTION_USB_PERMISSION);
 				// ACTION_USB_DEVICE_ATTACHED never comes on some devices so it should not be added here
-				filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-				context.registerReceiver(mUsbReceiver, filter);
-				context.registerReceiver(mUsbAttachDetachReceiver, filter, VL_INTERNAL_PERMISSION, null);
+				final IntentFilter usbDetachFilter = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
+				context.registerReceiver(mUsbReceiver, usbPermissionFilter);
+				context.registerReceiver(mUsbAttachDetachReceiver, usbDetachFilter, VL_INTERNAL_PERMISSION, null);
 			}
 			// start connection check
 			mDeviceCounts = 0;
