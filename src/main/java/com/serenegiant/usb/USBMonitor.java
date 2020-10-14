@@ -674,7 +674,14 @@ public final class USBMonitor {
 		if (useNewAPI && BuildCheck.isAndroid5()) {
 			sb.append("#");
 			if (TextUtils.isEmpty(serial)) {
-				sb.append(device.getSerialNumber());	sb.append("#");	// API >= 21
+				try {
+					sb.append(device.getSerialNumber());
+					sb.append("#");    // API >= 21
+				} catch (SecurityException e) {
+					Log.v(TAG, "getDeviceKeyName(), Error trying to get device serial number, app has not yet been granted permission to the usb device");
+					sb.append("Unknown Serial Number");
+					sb.append("#");
+				}
 			}
 			sb.append(device.getManufacturerName());	sb.append("#");	// API >= 21
 			sb.append(device.getConfigurationCount());	sb.append("#");	// API >= 21
@@ -904,49 +911,56 @@ public final class USBMonitor {
 			if (BuildCheck.isLollipop()) {
 				info.manufacturer = device.getManufacturerName();
 				info.product = device.getProductName();
-				info.serial = device.getSerialNumber();
+				try {
+					info.serial = device.getSerialNumber();
+				} catch (SecurityException e) {
+					Log.v(TAG, "updateDeviceInfo(), Error trying to get device serial number, app has not yet been granted permission to the usb device.");
+					info.serial = "Unknown Serial Number";
+				}
 			}
 			if (BuildCheck.isMarshmallow()) {
 				info.usb_version = device.getVersion();
 			}
 			if ((manager != null) && manager.hasPermission(device)) {
 				final UsbDeviceConnection connection = manager.openDevice(device);
-				final byte[] desc = connection.getRawDescriptors();
+				if (connection != null) {
+					final byte[] desc = connection.getRawDescriptors();
 
-				if (TextUtils.isEmpty(info.usb_version)) {
-					info.usb_version = String.format("%x.%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
-				}
-				if (TextUtils.isEmpty(info.version)) {
-					info.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
-				}
-				if (TextUtils.isEmpty(info.serial)) {
-					info.serial = connection.getSerial();
-				}
+					if (TextUtils.isEmpty(info.usb_version)) {
+						info.usb_version = String.format("%x.%02x", ((int) desc[3] & 0xff), ((int) desc[2] & 0xff));
+					}
+					if (TextUtils.isEmpty(info.version)) {
+						info.version = String.format("%x.%02x", ((int) desc[13] & 0xff), ((int) desc[12] & 0xff));
+					}
+					if (TextUtils.isEmpty(info.serial)) {
+						info.serial = connection.getSerial();
+					}
 
-				final byte[] languages = new byte[256];
-				int languageCount = 0;
-				// controlTransfer(int requestType, int request, int value, int index, byte[] buffer, int length, int timeout)
-				try {
-					int result = connection.controlTransfer(
-						USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
-	    				USB_REQ_GET_DESCRIPTOR,
-	    				(USB_DT_STRING << 8) | 0, 0, languages, 256, 0);
-					if (result > 0) {
-	        			languageCount = (result - 2) / 2;
+					final byte[] languages = new byte[256];
+					int languageCount = 0;
+					// controlTransfer(int requestType, int request, int value, int index, byte[] buffer, int length, int timeout)
+					try {
+						int result = connection.controlTransfer(
+								USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
+								USB_REQ_GET_DESCRIPTOR,
+								(USB_DT_STRING << 8) | 0, 0, languages, 256, 0);
+						if (result > 0) {
+							languageCount = (result - 2) / 2;
+						}
+						if (languageCount > 0) {
+							if (TextUtils.isEmpty(info.manufacturer)) {
+								info.manufacturer = getString(connection, desc[14], languageCount, languages);
+							}
+							if (TextUtils.isEmpty(info.product)) {
+								info.product = getString(connection, desc[15], languageCount, languages);
+							}
+							if (TextUtils.isEmpty(info.serial)) {
+								info.serial = getString(connection, desc[16], languageCount, languages);
+							}
+						}
+					} finally {
+						connection.close();
 					}
-					if (languageCount > 0) {
-						if (TextUtils.isEmpty(info.manufacturer)) {
-							info.manufacturer = getString(connection, desc[14], languageCount, languages);
-						}
-						if (TextUtils.isEmpty(info.product)) {
-							info.product = getString(connection, desc[15], languageCount, languages);
-						}
-						if (TextUtils.isEmpty(info.serial)) {
-							info.serial = getString(connection, desc[16], languageCount, languages);
-						}
-					}
-				} finally {
-					connection.close();
 				}
 			}
 			if (TextUtils.isEmpty(info.manufacturer)) {
