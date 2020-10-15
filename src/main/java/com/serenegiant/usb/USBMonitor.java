@@ -59,6 +59,7 @@ public final class USBMonitor {
 	private static final String ACTION_USB_PERMISSION_BASE = "com.serenegiant.USB_PERMISSION.";
 	private final String ACTION_USB_PERMISSION = ACTION_USB_PERMISSION_BASE + hashCode();
 	private static final String VL_INTERNAL_PERMISSION = "com.ucm.camera.INTERNAL_PERMISSION";
+	private static final String UNKNOWN_SERIAL = "Unknown Serial Number";
 
 	public static final String ACTION_USB_DEVICE_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED";
 
@@ -676,11 +677,11 @@ public final class USBMonitor {
 			if (TextUtils.isEmpty(serial)) {
 				try {
 					sb.append(device.getSerialNumber());
-					sb.append("#");    // API >= 21
 				} catch (SecurityException e) {
 					Log.v(TAG, "getDeviceKeyName(), Error trying to get device serial number, app has not yet been granted permission to the usb device");
-					sb.append("Unknown Serial Number");
-					sb.append("#");
+					sb.append(UNKNOWN_SERIAL);
+				} finally {
+					sb.append("#");    // API >= 21
 				}
 			}
 			sb.append(device.getManufacturerName());	sb.append("#");	// API >= 21
@@ -915,7 +916,7 @@ public final class USBMonitor {
 					info.serial = device.getSerialNumber();
 				} catch (SecurityException e) {
 					Log.v(TAG, "updateDeviceInfo(), Error trying to get device serial number, app has not yet been granted permission to the usb device.");
-					info.serial = "Unknown Serial Number";
+					info.serial = UNKNOWN_SERIAL;
 				}
 			}
 			if (BuildCheck.isMarshmallow()) {
