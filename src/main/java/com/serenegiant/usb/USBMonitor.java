@@ -26,6 +26,7 @@ package com.serenegiant.usb;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -474,10 +475,19 @@ public final class USBMonitor {
 		public void onReceive(final Context context, final Intent intent) {
 			if (destroyed) return;
 			final String action = intent.getAction();
+			intent.setExtrasClassLoader(new UsbDeviceClassLoader());
 			if (ACTION_USB_PERMISSION.equals(action)) {
 				// when received the result of requesting USB permission
 				synchronized (USBMonitor.this) {
-					final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+					UsbDevice deviceFromIntent;
+					try {
+						deviceFromIntent = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+						Log.v(TAG, "Device successfully pulled from intent");
+					} catch (Exception e) {
+						Log.e(TAG, "Illegal extra type provided to intent", e);
+						deviceFromIntent = null;
+					}
+					final UsbDevice device = deviceFromIntent;
 					if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
 						if (device != null) {
 							// get permission, call onConnect
@@ -1371,5 +1381,21 @@ public final class USBMonitor {
 			}
 		}
 	}
+
+    class UsbDeviceClassLoader extends ClassLoader {
+        private final List<String> VALID_CLASS_NAMES = Arrays.asList(UsbDevice.class.getName());
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            if (name == null) {
+                throw new ClassNotFoundException("Class being loaded provides no name");
+            }
+            // Extract parent class (eg. "android.net.Uri$HierarchicalUri" -> "android.net.Uri"
+            String parentClassName = name.split("\\$")[0]; // escape '$' as it is regex special char
+            if (!VALID_CLASS_NAMES.contains(parentClassName)) {
+                throw new ClassNotFoundException("Class not allowed: " + name);
+            }
+            return super.loadClass(name);
+        }
+    }
 
 }
