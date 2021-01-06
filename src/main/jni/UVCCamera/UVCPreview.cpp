@@ -709,6 +709,9 @@ void UVCPreview::addCaptureFrame(uvc_frame_t *frame) {
 		}
 		captureQueu = frame;
 		pthread_cond_broadcast(&capture_sync);
+	} else { // still need to recycle frame if isRunning is false, otherwise memory leak can occur
+	    // BM added from https://github.com/saki4510t/UVCCamera/issues/259#issuecomment-341611634
+	    recycle_frame(frame);
 	}
 	pthread_mutex_unlock(&capture_mutex);
 }
@@ -867,7 +870,11 @@ void UVCPreview::do_capture_callback(JNIEnv *env, uvc_frame_t *frame) {
 				}
 			}
 			jobject buf = env->NewDirectByteBuffer(callback_frame->data, callbackPixelBytes);
-			env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.onFrame, buf);
+			pthread_mutex_lock(&capture_mutex); // BM added from https://github.com/saki4510t/UVCCamera/issues/244#issuecomment-397502197
+			if (iframecallback_fields.onFrame != NULL) {
+			    env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.onFrame, buf);
+			}
+			pthread_mutex_unlock(&capture_mutex);
 			env->ExceptionClear();
 			env->DeleteLocalRef(buf);
 		}
