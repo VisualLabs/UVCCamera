@@ -871,7 +871,7 @@ void UVCPreview::do_capture_callback(JNIEnv *env, uvc_frame_t *frame) {
 			}
 			jobject buf = env->NewDirectByteBuffer(callback_frame->data, callbackPixelBytes);
 			pthread_mutex_lock(&capture_mutex); // BM added from https://github.com/saki4510t/UVCCamera/issues/244#issuecomment-397502197
-			if (iframecallback_fields.onFrame != NULL) {
+			if (iframecallback_fields.onFrame && mFrameCallbackObj) {
 			    env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.onFrame, buf);
 			}
 			pthread_mutex_unlock(&capture_mutex);
