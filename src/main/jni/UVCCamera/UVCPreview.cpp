@@ -25,6 +25,17 @@
 #include <stdlib.h>
 #include <linux/time.h>
 #include <unistd.h>
+#include <jni.h>
+
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdarg.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
+#include <signal.h>
 
 #if 1	// set 1 if you don't need debug log
 	#ifndef LOG_NDEBUG
@@ -230,6 +241,8 @@ int UVCPreview::setFrameCallback(JNIEnv *env, jobject frame_callback_obj, int pi
 				if (LIKELY(clazz)) {
 					iframecallback_fields.onFrame = env->GetMethodID(clazz,
 						"onFrame",	"(Ljava/nio/ByteBuffer;)V");
+					iframecallback_fields.test = env->GetMethodID(clazz,
+                    						"test",	"()V");
 				} else {
 					LOGW("failed to get object class");
 				}
@@ -845,11 +858,31 @@ void UVCPreview::do_capture_surface(JNIEnv *env) {
 	EXIT();
 }
 
+
+static struct sigaction old_sa[NSIG];
+
+void android_sigaction(int signal, siginfo_t *info, void *reserved)
+{
+    LOGW("^^^^^^ ERROR");
+    LOGW("signal=%d", signal);
+    // env -> ....
+    old_sa[signal].sa_handler(signal);
+}
+
+int i = 0;
 /**
 * call IFrameCallback#onFrame if needs
  */
 void UVCPreview::do_capture_callback(JNIEnv *env, uvc_frame_t *frame) {
 	ENTER();
+    struct sigaction handler;
+	memset(&handler, 0, sizeof(struct sigaction));
+    handler.sa_sigaction = android_sigaction;
+    handler.sa_flags = SA_RESETHAND;
+    #define CATCHSIG(X) sigaction(X, &handler, &old_sa[X])
+    CATCHSIG(SIGILL);
+    CATCHSIG(SIGABRT);
+    CATCHSIG(SIGSEGV);
 
 	if (LIKELY(frame)) {
 		uvc_frame_t *callback_frame = frame;
@@ -872,7 +905,14 @@ void UVCPreview::do_capture_callback(JNIEnv *env, uvc_frame_t *frame) {
 			jobject buf = env->NewDirectByteBuffer(callback_frame->data, callbackPixelBytes);
 			pthread_mutex_lock(&capture_mutex); // BM added from https://github.com/saki4510t/UVCCamera/issues/244#issuecomment-397502197
 			if (iframecallback_fields.onFrame && mFrameCallbackObj) {
-			    env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.onFrame, buf);
+			    i++;
+			    if (i == 100) {
+			        // For testing Segfault
+			        env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.test);
+			        env->CallVoidMethod(mFrameCallbackObj, NULL, buf);
+			    } else {
+			        env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.onFrame, buf);
+			    }
 			}
 			pthread_mutex_unlock(&capture_mutex);
 			env->ExceptionClear();

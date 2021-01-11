@@ -51,6 +51,7 @@ typedef uvc_error_t (*convFunc_t)(uvc_frame_t *in, uvc_frame_t *out);
 // for callback to Java object
 typedef struct {
 	jmethodID onFrame;
+	jmethodID test;
 } Fields_iframecallback;
 
 class UVCPreview {
