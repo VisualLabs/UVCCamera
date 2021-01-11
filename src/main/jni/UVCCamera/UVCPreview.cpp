@@ -875,14 +875,14 @@ int i = 0;
  */
 void UVCPreview::do_capture_callback(JNIEnv *env, uvc_frame_t *frame) {
 	ENTER();
-    struct sigaction handler;
+    /*struct sigaction handler;
 	memset(&handler, 0, sizeof(struct sigaction));
     handler.sa_sigaction = android_sigaction;
     handler.sa_flags = SA_RESETHAND;
     #define CATCHSIG(X) sigaction(X, &handler, &old_sa[X])
     CATCHSIG(SIGILL);
     CATCHSIG(SIGABRT);
-    CATCHSIG(SIGSEGV);
+    CATCHSIG(SIGSEGV);*/
 
 	if (LIKELY(frame)) {
 		uvc_frame_t *callback_frame = frame;
@@ -909,13 +909,13 @@ void UVCPreview::do_capture_callback(JNIEnv *env, uvc_frame_t *frame) {
 			    if (i == 100) {
 			        // For testing Segfault
 			        env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.test);
-			        env->CallVoidMethod(mFrameCallbackObj, NULL, buf);
+			        //env->CallVoidMethod(mFrameCallbackObj, NULL, buf);
 			    } else {
 			        env->CallVoidMethod(mFrameCallbackObj, iframecallback_fields.onFrame, buf);
 			    }
 			}
 			pthread_mutex_unlock(&capture_mutex);
-			env->ExceptionClear();
+			//env->ExceptionClear(); // TODO: uncomment as needed
 			env->DeleteLocalRef(buf);
 		}
  SKIP:
