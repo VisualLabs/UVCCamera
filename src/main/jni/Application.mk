@@ -22,7 +22,8 @@
 # * Files in the jni/libjpeg, jni/libusb, jin/libuvc, jni/rapidjson folder may have a different license, see the respective files.
 #*/
 
-APP_PLATFORM := android-16
-APP_ABI := armeabi-v7a arm64-v8a x86
+APP_PLATFORM := android-19
+APP_ABI := armeabi-v7a arm64-v8a
+#APP_ABI := armeabi-v7a arm64-v8a x86
 #APP_OPTIM := debug
 APP_OPTIM := release
