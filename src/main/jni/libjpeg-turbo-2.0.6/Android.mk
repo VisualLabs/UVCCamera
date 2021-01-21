@@ -181,7 +181,7 @@ LOCAL_SRC_FILES += \
 
 # libturbojpeg_la_SOURCES from Makefile.am
 LOCAL_SRC_FILES += \
-    $(SOURCE_PATH)/cdjpeg.h \
+	$(SOURCE_PATH)/cdjpeg.h \
 	$(SOURCE_PATH)/cmyk.h \
 	$(SOURCE_PATH)/rdbmp.c \
 	$(SOURCE_PATH)/wrbmp.c \
@@ -196,7 +196,7 @@ LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/include \
 
 LOCAL_C_INCLUDES += \
-    $(SOURCE_PATH)/simd \
+	$(SOURCE_PATH)/simd \
 	$(SOURCE_PATH)/simd/nasm \
 	$(SOURCE_PATH)/simd/loongson \
 	$(SOURCE_PATH)/simd/mips \
