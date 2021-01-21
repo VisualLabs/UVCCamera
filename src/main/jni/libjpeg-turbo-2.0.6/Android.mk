@@ -12,97 +12,7 @@ endif
 
 LOCAL_ASMFLAGS += -DELF
 
-ifeq ($(TARGET_ARCH_ABI),x86_64)
-LOCAL_SRC_FILES += \
-	$(SOURCE_PATH)/simd/x86_64/jsimd.c \
-	$(SOURCE_PATH)/simd/x86_64/jfdctflt-sse.asm \
-	$(SOURCE_PATH)/simd/x86_64/jfdctfst-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jfdctint-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jfdctint-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jidctflt-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jidctfst-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jidctint-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jidctint-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jidctred-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jccolor-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jccolor-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jcgray-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jcgray-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jcsample-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jcsample-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jdcolor-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jdcolor-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jdmerge-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jdmerge-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jdsample-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jdsample-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jquantf-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jquanti-avx2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jquanti-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jsimdcpu.asm \
-	$(SOURCE_PATH)/simd/x86_64/jchuff-sse2.asm \
-	$(SOURCE_PATH)/simd/x86_64/jcphuff-sse2.asm \
-
-
-LOCAL_CFLAGS += \
-	-DSIZEOF_SIZE_T=8 \
-
-LOCAL_ASMFLAGS += -D__x86_64__
-
-else ifeq ($(TARGET_ARCH_ABI),x86)
-LOCAL_SRC_FILES += \
-	$(LOCAL_PATH)/simd/i386/jsimd.c \
-	$(LOCAL_PATH)/simd/i386/jsimdcpu.asm \
-	$(SOURCE_PATH)/simd/i386/jccolor-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jccolor-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jccolor-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jcgray-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jcgray-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jcgray-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jchuff-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jcphuff-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jcsample-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jcsample-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jcsample-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jdcolor-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jdcolor-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jdcolor-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jdmerge-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jdmerge-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jdmerge-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jdsample-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jdsample-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jdsample-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctflt-3dn.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctflt-sse.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctfst-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctfst-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctint-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctint-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jfdctint-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jidctflt-3dn.asm \
-	$(SOURCE_PATH)/simd/i386/jidctflt-sse.asm \
-	$(SOURCE_PATH)/simd/i386/jidctflt-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jidctfst-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jidctfst-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jidctint-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jidctint-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jidctint-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jidctred-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jidctred-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jquant-3dn.asm \
-	$(SOURCE_PATH)/simd/i386/jquant-mmx.asm \
-	$(SOURCE_PATH)/simd/i386/jquant-sse.asm \
-	$(SOURCE_PATH)/simd/i386/jquantf-sse2.asm \
-	$(SOURCE_PATH)/simd/i386/jquanti-avx2.asm \
-	$(SOURCE_PATH)/simd/i386/jquanti-sse2.asm \
-
-LOCAL_CFLAGS += \
-	-DSIZEOF_SIZE_T=4 \
-
-LOCAL_ASMFLAGS += -DPIC
-
-else ifneq ($(filter $(TARGET_ARCH_ABI), armeabi-v7a),)
+ifneq ($(filter $(TARGET_ARCH_ABI), armeabi-v7a),)
 LOCAL_SRC_FILES += \
 	$(SOURCE_PATH)/simd/arm/jsimd.c \
 	$(SOURCE_PATH)/simd/arm/jsimd_neon.S \
@@ -190,7 +100,6 @@ LOCAL_SRC_FILES += \
 	$(SOURCE_PATH)/transupp.c \
 	$(SOURCE_PATH)/jdatadst-tj.c \
 	$(SOURCE_PATH)/jdatasrc-tj.c \
-#	$(SOURCE_PATH)/turbojpeg.c \
 
 LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/include \
