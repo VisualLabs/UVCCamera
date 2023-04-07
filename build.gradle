@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
 	repositories {
-		jcenter()
+		mavenCentral()
 		google()
 	}
 	dependencies {
@@ -39,7 +39,7 @@ allprojects {
 			dirs '../ucm_camera_prototype/libs'
 		}
 		maven { url 'https://raw.github.com/saki4510t/libcommon/master/repository/' }
-		jcenter()
+		mavenCentral()
 		google()
 	}
 }
