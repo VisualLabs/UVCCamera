@@ -50,6 +50,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import androidx.core.content.ContextCompat;
+
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
@@ -177,7 +179,7 @@ public final class USBMonitor {
 				final IntentFilter usbPermissionFilter = new IntentFilter(ACTION_USB_PERMISSION);
 				// ACTION_USB_DEVICE_ATTACHED never comes on some devices so it should not be added here
 				final IntentFilter usbDetachFilter = new IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED);
-				context.registerReceiver(mUsbReceiver, usbPermissionFilter);
+				ContextCompat.registerReceiver(context, mUsbReceiver, usbPermissionFilter, ContextCompat.RECEIVER_NOT_EXPORTED);
 				context.registerReceiver(mUsbAttachDetachReceiver, usbDetachFilter, VL_INTERNAL_PERMISSION, null);
 			}
 			// start connection check
